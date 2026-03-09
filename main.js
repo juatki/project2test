@@ -14,7 +14,7 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     infoBox: false,
     selectionIndicator: false
 });
-
+// jdfshdgoiushgoh
 // Globe appearance
 viewer.imageryLayers.removeAll();
 viewer.scene.globe.baseColor = Cesium.Color.WHITE;
