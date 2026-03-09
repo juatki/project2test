@@ -67,11 +67,14 @@ Cesium.GeoJsonDataSource.load("worldcountries.geojson", { clampToGround: true })
     viewer.dataSources.add(ds);
 
     ds.entities.values.forEach(entity => {
-        if (!entity.polygon) return;
-        entity.polygon.hierarchy = rebuildPolygon(entity);
-        entity.polygon.arcType = Cesium.ArcType.GEODESIC;
-        entity.polygon.material = Cesium.Color.BLACK;
-    });
+    if (!entity.polygon) return;
+
+    entity.polygon.hierarchy = rebuildPolygon(entity);
+    entity.polygon.arcType = Cesium.ArcType.GEODESIC;
+    entity.polygon.material = Cesium.Color.BLACK;
+
+    entity.polygon.zIndex = 0;   // draw underneath
+});
 });
 
 // Load fill GeoJSON
@@ -82,10 +85,16 @@ Cesium.GeoJsonDataSource.load("worldcountriesfill.geojson", { clampToGround: tru
     ds.entities.values.forEach(entity => {
         if (!entity.polygon) return;
 
+        // Rebuild polygon hierarchy
         entity.polygon.hierarchy = rebuildPolygon(entity);
         entity.polygon.arcType = Cesium.ArcType.GEODESIC;
+
+        // Fill styling
         entity.polygon.material = Cesium.Color.fromCssColorString("#8da5ad").withAlpha(1);
         entity.polygon.outline = false;
+
+        // Ensure this layer renders above the outline GeoJSON
+        entity.polygon.zIndex = 100;
 
         const countryName = entity.properties.name.getValue();
 
@@ -94,6 +103,7 @@ Cesium.GeoJsonDataSource.load("worldcountriesfill.geojson", { clampToGround: tru
             countryIndex[countryName] = [];
             countryNames.push(countryName);
         }
+
         countryIndex[countryName].push(entity);
     });
 
