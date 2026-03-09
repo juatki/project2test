@@ -61,44 +61,22 @@ let currentClueIndex = 0;
 let targetCountryInfo = {};
 const countryInfoCache = {};
 
-// Load outline GeoJSON
-Cesium.GeoJsonDataSource.load("worldcountries.geojson", { clampToGround: true }).then(ds => {
-    backgroundDataSource = ds;
-    viewer.dataSources.add(ds);
-
-    ds.entities.values.forEach(entity => {
-    if (!entity.polygon) return;
-
-    entity.polygon.hierarchy = rebuildPolygon(entity);
-    entity.polygon.arcType = Cesium.ArcType.GEODESIC;
-    entity.polygon.material = Cesium.Color.BLACK;
-
-    entity.polygon.zIndex = 0;   // draw underneath
-});
-});
-
-// Load fill GeoJSON
 Cesium.GeoJsonDataSource.load("worldcountriesfill.geojson", { clampToGround: true }).then(ds => {
+
     fillDataSource = ds;
     viewer.dataSources.add(ds);
 
     ds.entities.values.forEach(entity => {
+
         if (!entity.polygon) return;
 
-        // Rebuild polygon hierarchy
         entity.polygon.hierarchy = rebuildPolygon(entity);
         entity.polygon.arcType = Cesium.ArcType.GEODESIC;
-
-        // Fill styling
-        entity.polygon.material = Cesium.Color.fromCssColorString("#8da5ad").withAlpha(1);
+        entity.polygon.material = Cesium.Color.fromCssColorString("#000000ff").withAlpha(1);
         entity.polygon.outline = false;
-
-        // Ensure this layer renders above the outline GeoJSON
-        entity.polygon.zIndex = 100;
 
         const countryName = entity.properties.name.getValue();
 
-        // Build index
         if (!countryIndex[countryName]) {
             countryIndex[countryName] = [];
             countryNames.push(countryName);
@@ -126,6 +104,23 @@ function startCountryChallenge() {
         showNextClue();
     });
 }
+
+Cesium.GeoJsonDataSource.load("worldborders.geojson", { clampToGround: true }).then(ds => {
+
+    viewer.dataSources.add(ds);
+
+    ds.entities.values.forEach(entity => {
+
+        if (!entity.polyline) return;
+
+        entity.polyline.width = 4;
+        entity.polyline.material = Cesium.Color.BLACK;
+        entity.polyline.clampToGround = true;
+
+    });
+
+});
+
 
 // Show the next clue
 function showNextClue() {
@@ -236,9 +231,9 @@ handler.setInputAction(click => {
         label: {
             text: countryName,
             font: "50px sans-serif",
-            fillColor: Cesium.Color.BLACK,
+            fillColor: Cesium.Color.YELLOW,
             outlineColor: Cesium.Color.WHITE,
-            outlineWidth: 1,
+            outlineWidth: 3,
             style: Cesium.LabelStyle.FILL_AND_OUTLINE,
             verticalOrigin: Cesium.VerticalOrigin.CENTER,
             horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
